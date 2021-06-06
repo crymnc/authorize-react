@@ -1,0 +1,32 @@
+.top-navbar{
+    position: fixed;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    width: 100%;
+    height: 5rem;
+}
+
+.top-navbar ul{
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-navbar-link{
+    width: 4rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.top-navbar-link a{
+    color: var(--text-primary);
+}
+
+.top-navbar-link:hover{
+    color: var(--text-secondary);
+}
+
