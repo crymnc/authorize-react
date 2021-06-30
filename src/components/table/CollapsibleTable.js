@@ -23,7 +23,7 @@ const useRowStyles = makeStyles({
 });
 
 function Row(props) {
-    const { row,  } = props;
+    const { row } = props;
     const [open, setOpen] = React.useState(false);
     const classes = useRowStyles();
 
@@ -45,24 +45,24 @@ function Row(props) {
                     </IconButton>
                 </TableCell>
                 {
-                    Object.keys(newRow).map((key) => (
-                        <TableCell>{newRow[key]}</TableCell>
+                    Object.keys(newRow).map((key,index) => (
+                        <TableCell key={"cell"+index}>{newRow[key]}</TableCell>
                     ))
                 }
             </TableRow>
             <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={Object.keys(newRow).length+1}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box margin={1}>
                             <Typography variant="h6" gutterBottom component="div">
-                                History
+                                Other Information
                             </Typography>
                             <Table size="small" aria-label="purchases">
                                 <TableHead>
                                     <TableRow>
                                         {
-                                            subRow.header.map((key) =>(
-                                                <TableCell>{key}</TableCell>
+                                            subRow.header.map((key,index) =>(
+                                                <TableCell key={"subHead"+index}>{key}</TableCell>
                                             ))
                                         }
                                     </TableRow>
@@ -70,8 +70,8 @@ function Row(props) {
                                 <TableBody>
                                     <TableRow>
                                     {
-                                        subRow.data.map((key) =>(
-                                            <TableCell>{key}</TableCell>
+                                        subRow.data.map((key,index) =>(
+                                            <TableCell key={"subRow"+index}>{key}</TableCell>
                                         ))
                                     }
                                     </TableRow>
@@ -88,22 +88,20 @@ function Row(props) {
 export default function CollapsibleTable(tableConstructionData) {
     const {header, rows} = tableConstructionData;
     return (
-        <TableContainer component={Paper}>
+        <TableContainer style={{marginTop : 10}} component={Paper}>
             <Table aria-label="collapsible table">
                 <TableHead>
                     <TableRow>
                         <TableCell />
                         {
-                            header.map(head => (
-                                <TableCell>{head}</TableCell>
-                            ))
+                            header.map((head,index) => (<TableCell key={"head"+index}>{head}</TableCell>))
                         }
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row) => {
-                            return <Row key = {row.id} row={row}/>
-                    })}
+                    {
+                        rows.map((row,index) => <Row key={"row"+index} row={row} />)
+                    }
                 </TableBody>
             </Table>
         </TableContainer>

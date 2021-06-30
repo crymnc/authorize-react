@@ -4,7 +4,7 @@ import {useState} from 'react';
 import PropTypes from 'prop-types';
 import {signIn} from "../../api/auth/auth";
 
-const Login = ({setUser}) => {
+const Login = ({setToken}) => {
     const [username, setUserName] = useState();
     const [password, setPassword] = useState();
     const [error, setError] = useState();
@@ -12,11 +12,11 @@ const Login = ({setUser}) => {
     const handleSubmit = async e => {
         e.preventDefault();
         try {
-            const user = await signIn({
+            const token = await signIn({
                 username,
                 password
             });
-            setUser(user);
+            setToken(token);
         }
         catch (e) {
             setError(e.message)

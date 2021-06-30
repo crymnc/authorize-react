@@ -1,4 +1,27 @@
-table {
-    text-align: center;
-    color: #4979ff;
+.register-form {
+    width: 40vw;
+}
+
+.register-form-header {
+    padding: 5px;
+    font-size: 25px;
+    color: var(--cp-400);
+    background: var(--bg-primary);
+    border: 1px solid var(--bg-primary);
+    border-radius: 4px;
+    box-shadow: 3px 3px 6px rgba(4, 129, 177, 0.5);
+}
+
+.register-form .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+
+@media only screen and (max-width: 600px) {
+    .register-form {
+        width: 90vw;
+    }
 }

@@ -1,12 +1,15 @@
 export function signIn(credentials) {
-    return fetch('http://localhost:8090/api/authenticate', {
+    const body = 'grant_type=password&username='+credentials.username+'&password='+credentials.password;
+    const request = {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'username': credentials.username,
-            'password': credentials.password
-        }
-    }).then(response => {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic dGVzdENsaWVudElkOnNlY3JldA=='
+        },
+        body: body
+    };
+    return fetch('http://localhost:8090/oauth/token', request
+    ).then(response => {
         if (response.ok) {
             return response.json()
         }else if(response.status === 401){
@@ -16,14 +19,15 @@ export function signIn(credentials) {
     })
 }
 
-export async function getRefreshedUser(token) {
-    return await fetch('http://localhost:8090/api/refreshtoken', {
+export async function getRefreshedToken(token) {
+    const body = 'grant_type=refresh_token&refresh_token='+token;
+    return await fetch('http://localhost:8090/oauth/token', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token,
-            'isRefreshToken': true
-        }
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic dGVzdENsaWVudElkOnNlY3JldA=='
+        },
+        body: body
     }).then(response => {
         if (response.ok) {
             return response.json()

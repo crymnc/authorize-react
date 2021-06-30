@@ -1,34 +1,33 @@
-import React,{useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {getAllUsers} from "../../api/user";
-import useRefreshUser from "../../hooks/auth/useRefreshUser";
 import "./user.css"
 import CollapsibleTable from "../../components/table/CollapsibleTable";
+import {Link} from "react-router-dom";
 
 const User = () => {
-    const {refreshUser} = useRefreshUser();
     const [users, setUsers] = React.useState([]);
 
     useEffect(() => {
         const fetchedUsers = async () => {
-            const response = await getAllUsers((await refreshUser).token);
+            const response = await getAllUsers();
             setUsers(response);
         };
         return fetchedUsers();
     }, []);
 
-    var rows=[];
+    var rows = [];
     users.map((user) => {
         const subRow = {
-            header:[],
-            data:[]
+            header: [],
+            data: []
         };
-        user.userComponentContents.map((userComponentContent)=>{
+        user.userComponentContents.map((userComponentContent) => {
             subRow.header.push(userComponentContent.componentName)
             subRow.data.push(userComponentContent.content)
         })
 
         const row = {
-            id:user.id,
+            id: user.id,
             name: user.name,
             lastName: user.lastName,
             username: user.username,
@@ -38,14 +37,17 @@ const User = () => {
         }
         rows.push(row)
     })
-    const header = ['ID' , 'Name', 'Last Name', 'Username','Roles','Active'];
+    const header = ['ID', 'Name', 'Last Name', 'Username', 'Roles', 'Active'];
 
 
     return (
-        <div>
-            <h2>Users</h2>
-            <CollapsibleTable header = {header} rows ={rows}/>
-        </div>
+        <React.Fragment>
+            <fieldset className="form">
+                <legend className="register-form-header">Users</legend>
+                <Link className="form-button right" to="users/add">New User</Link>
+                <CollapsibleTable header={header} rows={rows}/>
+            </fieldset>
+        </React.Fragment>
     );
 };
 

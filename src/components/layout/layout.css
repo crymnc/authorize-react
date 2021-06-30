@@ -2,9 +2,19 @@
     margin-left: 5rem;
     margin-top: 5rem;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .layout{
     display: flex;
     flex-direction: row;
+}
+
+@media only screen and (max-width: 600px) {
+    .children {
+        margin-left: 0;
+    }
 }
