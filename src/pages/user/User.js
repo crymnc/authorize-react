@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {getAllUsers} from "../../api/user";
+import {userService} from "../../api/UserService";
 import "./user.css"
 import CollapsibleTable from "../../components/table/CollapsibleTable";
 import {Link} from "react-router-dom";
@@ -8,23 +8,19 @@ const User = () => {
     const [users, setUsers] = React.useState([]);
 
     useEffect(() => {
-        const fetchedUsers = async () => {
-            const response = await getAllUsers();
-            setUsers(response);
-        };
-        return fetchedUsers();
+        userService.getAllUsers().then(response => setUsers(response));
     }, []);
 
     var rows = [];
-    users.map((user) => {
+    users.forEach((user) => {
         const subRow = {
             header: [],
             data: []
         };
-        user.userComponentContents.map((userComponentContent) => {
+        user.userComponentContents.forEach((userComponentContent) => {
             subRow.header.push(userComponentContent.componentName)
             subRow.data.push(userComponentContent.content)
-        })
+        });
 
         const row = {
             id: user.id,
@@ -34,9 +30,9 @@ const User = () => {
             roles: user.roles.toString(),
             active: user.active.toString(),
             subRow
-        }
+        };
         rows.push(row)
-    })
+    });
     const header = ['ID', 'Name', 'Last Name', 'Username', 'Roles', 'Active'];
 
 

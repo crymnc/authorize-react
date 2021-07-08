@@ -1,8 +1,7 @@
 import React from 'react';
 import './login.css'
 import {useState} from 'react';
-import PropTypes from 'prop-types';
-import {signIn} from "../../api/auth/auth";
+import {apiService} from '../../api/ApiService';
 
 const Login = ({setToken}) => {
     const [username, setUserName] = useState();
@@ -12,11 +11,7 @@ const Login = ({setToken}) => {
     const handleSubmit = async e => {
         e.preventDefault();
         try {
-            const token = await signIn({
-                username,
-                password
-            });
-            setToken(token);
+            apiService.login({username, password}).then(response => setToken(response));
         }
         catch (e) {
             setError(e.message)
@@ -40,9 +35,5 @@ const Login = ({setToken}) => {
         </form>
     );
 };
-
-Login.propTypes = {
-    setRefreshUser: PropTypes.func.isRequired
-}
 
 export default Login;

@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
-import {getAllRoles,getSubConstants} from "../../api/reference";
-import {saveUser} from "../../api/user";
+import {referenceService} from "../../api/ReferenceService";
+import {userService} from "../../api/UserService";
 
 
 const AddUser = () => {
@@ -8,16 +8,12 @@ const AddUser = () => {
     const [userComponents, setUserComponents] = useState([]);
 
     useEffect(() => {
-        const roles = async () => {
-            const response = await getAllRoles();
-            setRoles(response);
-        };
-        return roles();
+        referenceService.getAllRoles().then(response => setRoles(response));
     }, []);
 
-    const getRoleComponents = async e => {
+    const getRoleComponents = e => {
         if(e.target.value !== "-1")
-            setUserComponents(await getSubConstants('role', e.target.value, 'usercomponent'));
+            referenceService.getSubConstants('role', e.target.value, 'usercomponent').then(response => setUserComponents(response));
         else
             setUserComponents([])
     };
@@ -30,7 +26,7 @@ const AddUser = () => {
         const password = e.target.elements["password"].value;
         const role = e.target.elements["roles"].value;
         const components = [];
-        userComponents.map((userComponent) => {
+        userComponents.forEach((userComponent) => {
             components.push({
                 "componentId":userComponent.id,
                 "content":e.target.elements["userComponent"+userComponent.id].value
@@ -47,7 +43,7 @@ const AddUser = () => {
         }
 
         console.log(request)
-        await saveUser(request);
+        await userService.saveUser(request);
     }
 
     return (

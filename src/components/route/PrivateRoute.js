@@ -1,21 +1,18 @@
 import React from 'react';
 import {Component} from 'react';
 import {Route} from 'react-router-dom';
-import {getRefreshedToken} from "../../api/auth/auth";
+import {apiService} from "../../api/ApiService";
 import jwt from "jsonwebtoken";
 import useToken from "../../hooks/auth/useToken";
 
-const PrivateRoute = ({component: Component, ...rest}) => {
+const PrivateRoute = ({ ...rest}) => {
     const {token, setToken} = useToken();
 
     if (token) {
         const decodedToken = jwt.decode(token.access_token);
         let expired = Date.now() >= decodedToken.exp * 1000;
         if (expired) {
-            const setRefreshedToken = async () => {
-                setToken(await getRefreshedToken(token.refresh_token));
-            }
-            setRefreshedToken();
+            apiService.refreshToken(token.refresh_token).then(response => setToken(response));
             return <div className="App">Loading...</div>;
         }
     }
