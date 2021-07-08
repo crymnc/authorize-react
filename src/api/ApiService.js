@@ -33,15 +33,39 @@ class ApiService {
         return config.retries.count < 3;
     }
 
-    async call(url, method, body) {
-        const requestOptions = this.createRequestOptions(url,method, body)
+    async call(url, method, body, cache) {
+        const cachedData = await this.isDataCached("FirstCacheStorage", url)
+        if (cachedData) {
+            return cachedData;
+        }
+        const requestOptions = this.createRequestOptions(url, method, body)
         await this.handleExpiredToken(requestOptions)
         return this.axios(requestOptions)
             .then(response => {
                 if (response.status === 200) {
+                    if (cache)
+                        this.cacheData("FirstCacheStorage", url, response.data)
                     return response.data
                 }
             }).catch(reason => console.log(reason))
+    }
+
+    cacheData(cacheName, url, response) {
+        const data = new Response(JSON.stringify(response));
+        if ('caches' in window) {
+            caches.open(cacheName).then((cache) => {
+                cache.put(url, data);
+            });
+        }
+    }
+
+    async isDataCached(cacheName, url) {
+        if ('caches' in window) {
+            return caches.open(cacheName).then(async (cache) => {
+                return await cache.match(url).then(data => data ? data.json():null);
+            });
+        }
+        return null;
     }
 
     async login(credentials) {
@@ -89,7 +113,7 @@ class ApiService {
 
     setAccessToken(accessToken) {
         sessionStorage.setItem('token', JSON.stringify(accessToken));
-        this.axios.defaults.headers.common.Authorization = 'Bearer '+accessToken.access_token;
+        this.axios.defaults.headers.common.Authorization = 'Bearer ' + accessToken.access_token;
     }
 
     isTokenExpired() {
@@ -98,12 +122,12 @@ class ApiService {
         return Date.now() >= decodedToken.exp * 1000;
     }
 
-    createRequestOptions(url, method, body){
+    createRequestOptions(url, method, body) {
         const token = JSON.parse(sessionStorage.getItem('token'));
         return {
             url: url,
             method: method,
-            headers : {
+            headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token.access_token
             },
@@ -118,6 +142,8 @@ class ApiService {
             })
         }
     }
+
+
 }
 
 export const apiService = new ApiService(); 
