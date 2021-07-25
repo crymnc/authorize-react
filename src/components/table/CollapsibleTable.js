@@ -39,48 +39,54 @@ function Row(props) {
     return (
         <React.Fragment>
             <TableRow className={classes.root}>
-                <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                    </IconButton>
-                </TableCell>
+                {subRow != null ?
+                    <TableCell>
+                        <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                            {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
+                        </IconButton>
+                    </TableCell> : null
+                }
                 {
                     Object.keys(newRow).map((key,index) => (
                         <TableCell key={"cell"+index}>{newRow[key]}</TableCell>
                     ))
                 }
             </TableRow>
-            <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={Object.keys(newRow).length+1}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box margin={1}>
-                            <Typography variant="h6" gutterBottom component="div">
-                                Other Information
-                            </Typography>
-                            <Table size="small" aria-label="purchases">
-                                <TableHead>
-                                    <TableRow>
-                                        {
-                                            subRow.header.map((key,index) =>(
-                                                <TableCell key={"subHead"+index}>{key}</TableCell>
-                                            ))
-                                        }
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow>
-                                    {
-                                        subRow.data.map((key,index) =>(
-                                            <TableCell key={"subRow"+index}>{key}</TableCell>
-                                        ))
-                                    }
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </Box>
-                    </Collapse>
-                </TableCell>
-            </TableRow>
+            {
+                subRow != null ? <TableRow>
+                    <TableCell style={{paddingBottom: 0, paddingTop: 0}}
+                               colSpan={Object.keys(newRow).length + 1}>
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                            <Box margin={1}>
+                                <Typography variant="h6" gutterBottom component="div">
+                                    Other Information
+                                </Typography>
+                                <Table size="small" aria-label="purchases">
+                                    <TableHead>
+                                        <TableRow>
+                                            {
+                                                subRow.header.map((key, index) => (
+                                                    <TableCell key={"subHead" + index}>{key}</TableCell>
+                                                ))
+                                            }
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        <TableRow>
+                                            {
+                                                subRow.data.map((key, index) => (
+                                                    <TableCell key={"subRow" + index}>{key}</TableCell>
+                                                ))
+                                            }
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </Box>
+                        </Collapse>
+                    </TableCell>
+                </TableRow> : null
+            }
+
         </React.Fragment>
     );
 }
@@ -92,7 +98,7 @@ export default function CollapsibleTable(tableConstructionData) {
             <Table aria-label="collapsible table">
                 <TableHead>
                     <TableRow>
-                        <TableCell />
+                        {rows[0] != null && rows[0].subRow != null ? <TableCell /> : null}
                         {
                             header.map((head,index) => (<TableCell key={"head"+index}>{head}</TableCell>))
                         }

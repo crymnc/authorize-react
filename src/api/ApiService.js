@@ -1,5 +1,6 @@
 import Axios from 'axios';
 import jwt from "jsonwebtoken";
+import {cacheService} from '../cache/CacheService';
 
 class ApiService {
 
@@ -34,38 +35,20 @@ class ApiService {
     }
 
     async call(url, method, body, cache) {
-        const cachedData = await this.isDataCached("FirstCacheStorage", url)
+        const request = await this.createRequest(url, method, body);
+        const cachedData = await cacheService.isDataCached("FirstCacheStorage", request)
         if (cachedData) {
             return cachedData;
         }
-        const requestOptions = this.createRequestOptions(url, method, body)
-        await this.handleExpiredToken(requestOptions)
-        return this.axios(requestOptions)
+        await this.handleExpiredToken(request)
+        return this.axios(request)
             .then(response => {
-                if (response.status === 200) {
-                    if (cache)
-                        this.cacheData("FirstCacheStorage", url, response.data)
-                    return response.data
-                }
+                if(method === 'POST')
+                    cacheService.deleteCache("FirstCacheStorage", request)
+                if (method === 'GET' && cache)
+                    cacheService.cacheData("FirstCacheStorage", request, response.data, null)
+                return response.data
             }).catch(reason => console.log(reason))
-    }
-
-    cacheData(cacheName, url, response) {
-        const data = new Response(JSON.stringify(response));
-        if ('caches' in window) {
-            caches.open(cacheName).then((cache) => {
-                cache.put(url, data);
-            });
-        }
-    }
-
-    async isDataCached(cacheName, url) {
-        if ('caches' in window) {
-            return caches.open(cacheName).then(async (cache) => {
-                return await cache.match(url).then(data => data ? data.json():null);
-            });
-        }
-        return null;
     }
 
     async login(credentials) {
@@ -91,6 +74,10 @@ class ApiService {
 
     async refreshToken() {
         const token = JSON.parse(sessionStorage.getItem('token'));
+        if (token == null || this.isRefreshTokenExpired()) {
+            window.location.href = '/login';
+            return;
+        }
         const body = 'grant_type=refresh_token&refresh_token=' + token.refresh_token;
         const request = {
             url: 'http://localhost:8090/oauth/token',
@@ -118,12 +105,28 @@ class ApiService {
 
     isTokenExpired() {
         const token = JSON.parse(sessionStorage.getItem('token'));
-        const decodedToken = jwt.decode(token.access_token);
-        return Date.now() >= decodedToken.exp * 1000;
+        if(token != null) {
+            const decodedToken = jwt.decode(token.access_token);
+            return Date.now() >= decodedToken.exp * 1000;
+        }
+        return true;
     }
 
-    createRequestOptions(url, method, body) {
+    isRefreshTokenExpired() {
         const token = JSON.parse(sessionStorage.getItem('token'));
+        if(token != null) {
+            const decodedToken = jwt.decode(token.refresh_token);
+            return Date.now() >= decodedToken.exp * 1000;
+        }
+        return true;
+    }
+
+    createRequest(url, method, body) {
+        const token = JSON.parse(sessionStorage.getItem('token'));
+        if (token == null) {
+            window.location.href = '/login';
+            return;
+        }
         return {
             url: url,
             method: method,
@@ -135,10 +138,10 @@ class ApiService {
         }
     }
 
-    async handleExpiredToken(requestOptions) {
+    async handleExpiredToken(request) {
         if (this.isTokenExpired()) {
             await this.refreshToken().then(token => {
-                requestOptions.headers.Authorization = 'Bearer ' + token.access_token
+                request.headers.Authorization = 'Bearer ' + token.access_token
             })
         }
     }

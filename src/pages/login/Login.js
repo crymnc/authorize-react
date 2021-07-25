@@ -11,7 +11,12 @@ const Login = ({setToken}) => {
     const handleSubmit = async e => {
         e.preventDefault();
         try {
-            apiService.login({username, password}).then(response => setToken(response));
+            apiService.login({username, password}).then(response => {
+                setToken(response)
+                if(response != null ) {
+                    window.location.href = '/';
+                }
+            });
         }
         catch (e) {
             setError(e.message)

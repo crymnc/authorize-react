@@ -9,11 +9,12 @@ import User from "./pages/user/User";
 import AddUser from "./pages/user/AddUser";
 import useToken from "./hooks/auth/useToken";
 import PrivateRoute from "./components/route/PrivateRoute";
+import {apiService} from "./api/ApiService";
+import Constant from "./pages/constant/Constant";
 
 function App() {
-    const {token, setToken} = useToken();
-
-    if (!token) {
+    const {setToken} = useToken();
+    if (apiService.isTokenExpired() && apiService.isRefreshTokenExpired()) {
         return <Login setToken={setToken}/>
     }
 
