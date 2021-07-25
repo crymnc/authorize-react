@@ -1,26 +1,23 @@
 .navbar {
-    position: fixed;
+    position: sticky;
     z-index: 1;
     background-color: var(--bg-primary);
     transition: width var(--transition-speed-slow) ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .navbar-nav {
+    overflow-y: scroll;
+    overflow-x: hidden;
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
 }
 
 .nav-item {
     width: 100%;
-}
-
-.nav-item:last-child {
-    margin-top: auto;
 }
 
 .nav-link {
@@ -51,11 +48,7 @@
 }
 
 .fa-primary {
-    color: var(--cp-400);
-}
-
-.fa-secondary {
-    color: #df49a6;
+    color: var(--primary-400);
 }
 
 .fa-primary,
@@ -66,7 +59,6 @@
 .logo {
     font-weight: bold;
     text-transform: uppercase;
-    margin-bottom: 1rem;
     text-align: center;
     color: var(--text-secondary);
     background: var(--bg-secondary);
@@ -90,6 +82,18 @@
 
 .navbar:hover .logo svg {
     transform: rotate(-180deg);
+}
+
+.navbar-nav::-webkit-scrollbar {
+    width: 0.25rem;
+}
+
+.navbar-nav::-webkit-scrollbar-track {
+    background: #1e1e24;
+}
+
+.navbar-nav::-webkit-scrollbar-thumb {
+    background: #EAE1FC;
 }
 
 /* Small screens */

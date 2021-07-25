@@ -27,6 +27,7 @@ function App() {
                         <PrivateRoute exact path="/about" component={About}/>
                         <PrivateRoute exact path="/users" component={User}/>
                         <PrivateRoute exact path="/users/add" component={AddUser}/>
+                        <PrivateRoute exact path="/constants" component={Constant}/>
                     </Switch>
                 </Layout>
             </Router>

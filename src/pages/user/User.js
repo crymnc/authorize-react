@@ -39,8 +39,8 @@ const User = () => {
     return (
         <React.Fragment>
             <fieldset className="form">
-                <legend className="register-form-header">Users</legend>
-                <Link className="form-button right" to="users/add">New User</Link>
+                <legend className="form-header">Users</legend>
+                <Link className="link-button right" to="users/add">New User</Link>
                 <CollapsibleTable header={header} rows={rows}/>
             </fieldset>
         </React.Fragment>

@@ -13,7 +13,9 @@ const AddUser = () => {
 
     const getRoleComponents = e => {
         if(e.target.value !== "-1")
-            referenceService.getSubConstants('role', e.target.value, 'usercomponent').then(response => setUserComponents(response));
+            referenceService.getSubConstants('role', e.target.value, 'usercomponent').then(response => {
+                response ? setUserComponents(response) : setUserComponents([])
+            });
         else
             setUserComponents([])
     };
@@ -41,35 +43,33 @@ const AddUser = () => {
             "userComponentContents": components,
             "active":true
         }
-
-        console.log(request)
         await userService.saveUser(request);
     }
 
     return (
         <form onSubmit={saveNewUser}>
-            <fieldset className="form register-form">
-                <legend className="register-form-header">New User</legend>
+            <fieldset className="form normal-size">
+                <legend className="form-header">New User</legend>
 
                 <div key={"name"} className="row">
                     <span key={1}>Name</span>
-                    <input placeholder="Name" id="name" type="text"/>
+                    <input placeholder="Name" id="name" type="text" className="input"/>
                 </div>
                 <div key={"lastName"} className="row">
                     <span>Last Name</span>
-                    <input placeholder="Last Name" id="lastName" type="text" />
+                    <input placeholder="Last Name" id="lastName" type="text" className="input"/>
                 </div>
                 <div key={"username"} className="row">
                     <span>Username</span>
-                    <input placeholder="Username" id="username" type="text"/>
+                    <input placeholder="Username" id="username" type="text" className="input"/>
                 </div>
                 <div key={"password"} className="row">
                     <span>Password</span>
-                    <input placeholder="Password" id="password" type="password"/>
+                    <input placeholder="Password" id="password" type="password" className="input"/>
                 </div>
                 <div key={"roles"} className="row">
                     <span>Roles</span>
-                    <select id="roles" onChange={getRoleComponents}>
+                    <select id="roles" className="select" onChange={getRoleComponents}>
                         <option key={-1} value="-1">Select</option>
                         {roles.map(role => <option key={role.id} value={role.id}>{role.dsc}</option>)}
                     </select>
@@ -78,11 +78,11 @@ const AddUser = () => {
                     userComponents.map((userComponent) =>
                         <div key={"userComponent"+userComponent.id} className="row">
                             <span>{userComponent.dsc}</span>
-                            <input placeholder={userComponent.dsc} id={"userComponent"+userComponent.id} type="text"/>
+                            <input placeholder={userComponent.dsc} id={"userComponent"+userComponent.id} className="input" type="text"/>
                         </div>)
                 }
                 <div key={"save"} className="row">
-                    <button type="submit" className="save">Save</button>
+                    <button type="submit" className="button primary-button save-button">Save</button>
                 </div>
             </fieldset>
         </form>

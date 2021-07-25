@@ -4,8 +4,10 @@
     justify-content: flex-end;
     align-items: center;
     background-color: var(--bg-secondary);
-    width: 100vw;
     height: 5rem;
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
 .top-navbar ul{
