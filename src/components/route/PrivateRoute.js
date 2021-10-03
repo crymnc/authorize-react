@@ -8,9 +8,7 @@ const PrivateRoute = ({ ...rest}) => {
     const {token, setToken} = useToken();
 
     if(apiService.isTokenExpired()){
-        console.log("Token expired")
         if(apiService.isRefreshTokenExpired()){
-            console.log("Refresh token expired")
             window.location.href = '/login';
             return "Redirecting";
         }

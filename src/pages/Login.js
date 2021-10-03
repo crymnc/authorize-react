@@ -1,7 +1,6 @@
 import React from 'react';
-import './login.css'
 import {useState} from 'react';
-import {apiService} from '../../api/ApiService';
+import {apiService} from '../api/ApiService';
 
 const Login = ({setToken}) => {
     const [username, setUserName] = useState();

@@ -18,6 +18,9 @@ class ReferenceService {
         return await apiService.call('http://localhost:8090/api/constants/'+referenceName ,'POST', reference, false);
     }
     
+    async deleteReference(referenceName, referenceId){
+        return await apiService.call('http://localhost:8090/api/constants/'+referenceName+'/'+referenceId ,'DELETE', null, false);
+    }
 }
 
 export const referenceService = new ReferenceService();

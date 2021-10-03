@@ -1,16 +1,19 @@
 import './App.css';
 import {BrowserRouter as Router, Switch} from 'react-router-dom';
-import Login from './pages/login/Login';
+import Login from './pages/Login';
 import React from 'react';
 import Layout from "./components/layout/Layout";
-import About from "./pages/about/About";
-import Home from "./pages/home/Home";
-import User from "./pages/user/User";
-import AddUser from "./pages/user/AddUser";
+import About from "./pages/About";
+import Home from "./pages/Home";
+import User from "./pages/User";
+import AddUser from "./pages/AddUser";
 import useToken from "./hooks/auth/useToken";
 import PrivateRoute from "./components/route/PrivateRoute";
 import {apiService} from "./api/ApiService";
-import Constant from "./pages/constant/Constant";
+import Constant from "./pages/Constant";
+import GlobalStyles from "./GlobalStyles";
+import {ThemeProvider} from "@material-ui/core";
+import theme from "./theme";
 
 function App() {
     const {setToken} = useToken();
@@ -19,7 +22,8 @@ function App() {
     }
 
     return (
-        <div>
+        <ThemeProvider theme={theme}>
+            <GlobalStyles/>
             <Router>
                 <Layout>
                     <Switch>
@@ -31,7 +35,7 @@ function App() {
                     </Switch>
                 </Layout>
             </Router>
-        </div>
+        </ThemeProvider>
     );
 }
 

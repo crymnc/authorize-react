@@ -1,5 +1,6 @@
 import React from 'react';
 import './sidebar.css';
+
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faAtom, faUser, faHome, faAngleDoubleRight, faAddressCard} from '@fortawesome/free-solid-svg-icons';
 import {Link} from "react-router-dom";

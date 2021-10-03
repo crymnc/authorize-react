@@ -32,7 +32,7 @@ class CacheService {
     }
 
     deleteCache(cacheName, request) {
-        const cacheRequest = request.url + "-" + request.method;
+        const cacheRequest = request.url + "-GET";
         caches.open(cacheName).then(async (cache) => {
             cache.delete(cacheRequest)
         })

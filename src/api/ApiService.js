@@ -1,12 +1,13 @@
 import Axios from 'axios';
 import jwt from "jsonwebtoken";
 import {cacheService} from '../cache/CacheService';
+import {ApiErrors} from './ApiErrors';
+
 
 class ApiService {
 
     constructor() {
         this.axios = Axios.create();
-        this.axios.interceptors.response.use(null, this.authInterceptor);
 
         this.get = this.axios.get.bind(this.axios);
         this.post = this.axios.post.bind(this.axios);
@@ -16,15 +17,33 @@ class ApiService {
         error.config.retries = error.config.retries || {
             count: 0,
         };
-        if (this.isUnAuthorizedError(error) && this.shouldRetry(error.config)) {
-            return this.refreshToken().then(value => {
-                error.config.headers['Authorization'] = 'Bearer ' + value.access_token;
-                error.config.retries.count += 1;
-                return this.axios(error.config)
-            });
+        console.log("incepter starting")
+        console.log(error.config.url + "in inceptor")
+        if (error.config.url !== 'http://localhost:8090/oauth/token' && this.isUnAuthorizedError(error) && this.shouldRetry(error.config)) {
+            console.log(error.config.url)
+            console.log("authInceptor")
+            console.log("Error count " + error.config.retries.count)
+            while (error.config.retries.count < 3) {
+                this.refreshToken().then(value => {
+                    console.log("Authorized")
+                    console.log(value)
+                    error.config.headers['Authorization'] = 'Bearer ' + value.access_token;
+                    error.config.retries.count += 1;
+                    return this.axios(error.config)
+                }).catch(reason => {
+                    console.log("error occured")
+                    console.log(reason)
+                    if (reason.status === 401) {
+                        sessionStorage.removeItem('token')
+                        error.config.retries.count = 3
+                    }
+                    error.config.retries.count += 1;
+                })
+            }
         }
         return Promise.reject(error);
     }
+
 
     isUnAuthorizedError(error) {
         return error.config && error.response && error.response.status === 401;
@@ -34,7 +53,7 @@ class ApiService {
         return config.retries.count < 3;
     }
 
-    async call(url, method, body, cache) {
+    async call(url, method, body, cache, retryCount = 0) {
         const request = await this.createRequest(url, method, body);
         const cachedData = await cacheService.isDataCached("FirstCacheStorage", request)
         if (cachedData) {
@@ -43,12 +62,19 @@ class ApiService {
         await this.handleExpiredToken(request)
         return this.axios(request)
             .then(response => {
-                if(method === 'POST')
+                if (method === 'POST')
                     cacheService.deleteCache("FirstCacheStorage", request)
                 if (method === 'GET' && cache)
                     cacheService.cacheData("FirstCacheStorage", request, response.data, null)
                 return response.data
-            }).catch(reason => console.log(reason))
+            }).catch(reason =>{
+                if(reason.status === 401 && retryCount <= 2){
+                    this.refreshToken().then(() => {
+                        return this.call(url,method,body,retryCount++)
+                    }).catch(exception => exception)
+                }
+            });
+
     }
 
     async login(credentials) {
@@ -90,11 +116,13 @@ class ApiService {
         };
         return this.axios(request).then(response => {
             if (response.status === 200) {
-                return response.data
+                this.setAccessToken(response.data);
             }
-        }).then(response => {
-            this.setAccessToken(response);
-            return response;
+            sessionStorage.removeItem('token');
+        }).catch(reason => {
+            sessionStorage.removeItem('token');
+            if(reason.status === 401)
+                throw ApiErrors.REFRESH_TOKEN_FAILED;
         })
     }
 
@@ -105,7 +133,7 @@ class ApiService {
 
     isTokenExpired() {
         const token = JSON.parse(sessionStorage.getItem('token'));
-        if(token != null) {
+        if (token != null) {
             const decodedToken = jwt.decode(token.access_token);
             return Date.now() >= decodedToken.exp * 1000;
         }
@@ -114,7 +142,7 @@ class ApiService {
 
     isRefreshTokenExpired() {
         const token = JSON.parse(sessionStorage.getItem('token'));
-        if(token != null) {
+        if (token != null) {
             const decodedToken = jwt.decode(token.refresh_token);
             return Date.now() >= decodedToken.exp * 1000;
         }
@@ -140,8 +168,12 @@ class ApiService {
 
     async handleExpiredToken(request) {
         if (this.isTokenExpired()) {
-            await this.refreshToken().then(token => {
+            return await this.refreshToken().then(token => {
                 request.headers.Authorization = 'Bearer ' + token.access_token
+            }).catch(reason => {
+                if(reason.status === 401)
+                    throw ApiErrors.REFRESH_TOKEN_FAILED;
+                throw reason;
             })
         }
     }
